@@ -1,11 +1,13 @@
 const TimeLockedWallet = artifacts.require("./TimeLockedWallet.sol");
 const ToptalToken = artifacts.require("./ToptalToken.sol");
 
-let ethToSend = web3.utils.toWei("1.00", "ether");
-let someGas   = web3.utils.toWei("0.01", "ether");
+const decimals  = web3.utils.toBN("18");
+const ethToSend = web3.utils.toBN("10").pow(decimals);  // toWei("1", "ether");
+const someGas   = web3.utils.toWei("0.01", "ether");
 let creator;
 let owner;
 
+// time difference between test script 'now' and blockchain 'now' = 'block.timestamp'
 const unlockTimeDiff = 60;  // set unlocktime x sec into the past
 
 contract('TimeLockedWallet', (accounts) => {
@@ -15,8 +17,6 @@ contract('TimeLockedWallet', (accounts) => {
         owner = accounts[1];
         other = accounts[2];
     });
-
-    console.log("ethToSend =", ethToSend.toString(10));
 
 
     it("Owner can withdraw the funds after the unlock date", async () => {
@@ -130,9 +130,9 @@ contract('TimeLockedWallet', (accounts) => {
         assert(info[2].toNumber() == unlockDate);
 
         const creationDateDiff = Math.abs(info[3].toNumber() - now);
-        assert(creationDateDiff < 10 );  // creationDate should be "similar"
+        assert(creationDateDiff < 10 );  // creationDate should be "similar", increase for real chain
 
-        assert(info[4].eq(web3.utils.toBN(ethToSend)));
+        assert(info[4].eq(ethToSend));   // compare as BN big numbers
     });
 
 });
