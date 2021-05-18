@@ -1,8 +1,8 @@
 const TimeLockedWallet = artifacts.require("./TimeLockedWallet.sol");
 const ToptalToken = artifacts.require("./ToptalToken.sol");
 
-let ethToSend = web3.toWei(1, "ether");
-let someGas = web3.toWei(0.01, "ether");
+let ethToSend = web3.utils.toBN("1", "ether");
+let someGas = web3.utils.toWei("0.01", "ether");
 let creator;
 let owner;
 
@@ -86,13 +86,13 @@ contract('TimeLockedWallet', (accounts) => {
     it("Owner can withdraw the ToptalToken after the unlock date", async () => {
         //set unlock date in unix epoch to now
         let now = Math.floor((new Date).getTime() / 1000);
-        //create the wallet contract 
+        //create the wallet contract
         let timeLockedWallet = await TimeLockedWallet.new(creator, owner, now);
 
         //create ToptalToken contract
         let toptalToken = await ToptalToken.new({from: creator});
         //check contract initiated well and has 1M of tokens
-        assert(1000000000000 == await toptalToken.balanceOf(creator));        
+        assert(1000000000000 == await toptalToken.balanceOf(creator));
 
         //load the wallet with some Toptal tokens
         let amountOfTokens = 1000000000;
@@ -113,10 +113,10 @@ contract('TimeLockedWallet', (accounts) => {
         let unlockDate = now + 100000;
         // Create new LockedWallet.
         let timeLockedWallet = await TimeLockedWallet.new(creator, owner, unlockDate);
-        // Send ether to the wallet.        
+        // Send ether to the wallet.
         await timeLockedWallet.send(ethToSend, {from: creator});
-        
-        // Get info about the wallet. 
+
+        // Get info about the wallet.
         let info = await timeLockedWallet.info();
 
         // Compare result with expected values.
@@ -124,7 +124,7 @@ contract('TimeLockedWallet', (accounts) => {
         assert(info[1] == owner);
         assert(info[2].toNumber() == unlockDate);
         assert(info[3].toNumber() == now);
-        assert(info[4].toNumber() == ethToSend);
+        assert(info[4].eq(ethToSend));
     });
 
 });

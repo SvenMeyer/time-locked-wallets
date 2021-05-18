@@ -1,8 +1,8 @@
 const TimeLockedWallet = artifacts.require("./TimeLockedWallet.sol");
 const TimeLockedWalletFactory = artifacts.require("./TimeLockedWalletFactory.sol");
 
-let ethToSend = web3.toWei(1, "ether");
-let someGas = web3.toWei(0.01, "ether");
+let ethToSend = web3.utils.toWei("1", "ether");
+let someGas = web3.utils.toWei("0.01", "ether");
 let timeLockedWalletFactory;
 let creator;
 let owner;
@@ -31,7 +31,7 @@ contract('TimeLockedWalletFactory', (accounts) => {
         // Check if wallet can be found in owners's wallets.
         let ownerWallets = await timeLockedWalletFactory.getWallets.call(owner);
         assert(1 == ownerWallets.length);
-        
+
         // Check if this is the same wallet for both of them.
         assert(creatorWallets[0] === ownerWallets[0]);
     });
