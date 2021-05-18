@@ -1,15 +1,16 @@
-pragma solidity ^0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.16;
 
 import "./TimeLockedWallet.sol";
 
 contract TimeLockedWalletFactory {
- 
+
     mapping(address => address[]) wallets;
 
-    function getWallets(address _user) 
+    function getWallets(address _user)
         public
         view
-        returns(address[])
+        returns(address[] memory)
     {
         return wallets[_user];
     }
@@ -17,30 +18,30 @@ contract TimeLockedWalletFactory {
     function newTimeLockedWallet(address _owner, uint256 _unlockDate)
         payable
         public
-        returns(address wallet)
+        returns(address payable walletAddress)
     {
         // Create new wallet.
-        wallet = new TimeLockedWallet(msg.sender, _owner, _unlockDate);
-        
+        walletAddress = address(new TimeLockedWallet(msg.sender, _owner, _unlockDate));
+
         // Add wallet to sender's wallets.
-        wallets[msg.sender].push(wallet);
+        wallets[msg.sender].push(walletAddress);
 
         // If owner is the same as sender then add wallet to sender's wallets too.
         if(msg.sender != _owner){
-            wallets[_owner].push(wallet);
+            wallets[_owner].push(walletAddress);
         }
 
         // Send ether from this transaction to the created contract.
-        wallet.transfer(msg.value);
+        walletAddress.transfer(msg.value);
 
         // Emit event.
-        Created(wallet, msg.sender, _owner, now, _unlockDate, msg.value);
+        emit Created(walletAddress, msg.sender, _owner, now, _unlockDate, msg.value);
     }
 
     // Prevents accidental sending of ether to the factory
-    function () public {
+    function () external {
         revert();
     }
 
-    event Created(address wallet, address from, address to, uint256 createdAt, uint256 unlockDate, uint256 amount);
+    event Created(address walletAddress, address from, address to, uint256 createdAt, uint256 unlockDate, uint256 amount);
 }

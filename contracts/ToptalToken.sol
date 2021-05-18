@@ -1,4 +1,5 @@
-pragma solidity ^0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.16;
 
 import './SafeMath.sol';
 import './ERC20.sol';
@@ -17,7 +18,7 @@ contract ToptalToken is ERC20 {
   string public symbol = "TTT";
   uint256 public decimals = 6;
 
-  function ToptalToken() public {
+  constructor() public {
     totalSupply = 1000000 * (10 ** decimals);
     balances[msg.sender] = totalSupply;
   }
@@ -43,7 +44,7 @@ contract ToptalToken is ERC20 {
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
-    Transfer(msg.sender, _to, _value);
+    emit Transfer(msg.sender, _to, _value);
     return true;
   }
 
@@ -61,7 +62,7 @@ contract ToptalToken is ERC20 {
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-    Transfer(_from, _to, _value);
+    emit Transfer(_from, _to, _value);
     return true;
   }
 
@@ -77,7 +78,7 @@ contract ToptalToken is ERC20 {
    */
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
-    Approval(msg.sender, _spender, _value);
+    emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
@@ -94,4 +95,3 @@ contract ToptalToken is ERC20 {
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
-
